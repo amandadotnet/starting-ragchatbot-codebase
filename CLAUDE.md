@@ -23,7 +23,18 @@ The app serves at `http://localhost:8000`. API docs at `http://localhost:8000/do
 
 **Environment setup:** Copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY`.
 
-There is no test suite. To verify behavior, run the server and exercise `POST /api/query` or the web UI.
+**Run the test suite** (from repo root):
+```bash
+uv run --extra dev pytest
+```
+
+Run a single file or test:
+```bash
+uv run --extra dev pytest backend/tests/test_session_manager.py
+uv run --extra dev pytest backend/tests/test_document_processor.py::test_extracts_course_title
+```
+
+Tests live in `backend/tests/`. `conftest.py` mocks chromadb, sentence-transformers, and the Anthropic client so the suite runs fast with no external deps or disk state. API tests mock `rag_system` and use FastAPI's `TestClient`.
 
 ## Architecture
 
