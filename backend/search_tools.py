@@ -89,28 +89,42 @@ class CourseSearchTool(Tool):
         """Format search results with course and lesson context"""
         formatted = []
         sources = []  # Track sources for the UI
-        
+        link_cache = {}  # Avoid duplicate lookups for same (course, lesson)
+
         for doc, meta in zip(results.documents, results.metadata):
             course_title = meta.get('course_title', 'unknown')
             lesson_num = meta.get('lesson_number')
-            
+
             # Build context header
             header = f"[{course_title}"
             if lesson_num is not None:
                 header += f" - Lesson {lesson_num}"
             header += "]"
-            
-            # Track source for the UI
-            source = course_title
+
+            # Build source label
+            label = course_title
             if lesson_num is not None:
-                source += f" - Lesson {lesson_num}"
+                label += f" - Lesson {lesson_num}"
+
+            # Look up link (lesson-level first, course-level as fallback)
+            cache_key = (course_title, lesson_num)
+            if cache_key not in link_cache:
+                url = None
+                if lesson_num is not None:
+                    url = self.store.get_lesson_link(course_title, lesson_num)
+                if not url:
+                    url = self.store.get_course_link(course_title)
+                link_cache[cache_key] = url
+
+            url = link_cache[cache_key]
+            source = f"[{label}]({url})" if url else label
             sources.append(source)
-            
+
             formatted.append(f"{header}\n{doc}")
-        
+
         # Store sources for retrieval
         self.last_sources = sources
-        
+
         return "\n\n".join(formatted)
 
 class ToolManager:

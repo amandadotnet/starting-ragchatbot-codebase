@@ -75,6 +75,8 @@ def test_execute_tracks_sources(tool, store):
         ["content"],
         [{"course_title": "My Course", "lesson_number": 2}],
     )
+    store.get_lesson_link.return_value = None
+    store.get_course_link.return_value = None
     tool.execute(query="something")
     assert "My Course - Lesson 2" in tool.last_sources
 
@@ -128,6 +130,8 @@ def test_tool_manager_get_last_sources(store):
     store.search.return_value = _results(
         ["content"], [{"course_title": "Course A", "lesson_number": 1}]
     )
+    store.get_lesson_link.return_value = None
+    store.get_course_link.return_value = None
     tm = ToolManager()
     tm.register_tool(CourseSearchTool(store))
     tm.execute_tool("search_course_content", query="test")
