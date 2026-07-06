@@ -29,10 +29,14 @@ All responses must be:
 Provide only the direct answer to what was asked.
 """
     
+    PLACEHOLDER_KEY = "your-anthropic-api-key-here"
+
     def __init__(self, api_key: str, model: str):
-        self.client = anthropic.Anthropic(api_key=api_key)
+        self.mock_mode = not api_key or api_key == self.PLACEHOLDER_KEY
         self.model = model
-        
+        if not self.mock_mode:
+            self.client = anthropic.Anthropic(api_key=api_key)
+
         # Pre-build base API parameters
         self.base_params = {
             "model": self.model,
@@ -76,13 +80,17 @@ Provide only the direct answer to what was asked.
             api_params["tools"] = tools
             api_params["tool_choice"] = {"type": "auto"}
         
+        # Mock mode: run the search tool directly and format results
+        if self.mock_mode:
+            return self._mock_response(query, tool_manager)
+
         # Get response from Claude
         response = self.client.messages.create(**api_params)
-        
+
         # Handle tool execution if needed
         if response.stop_reason == "tool_use" and tool_manager:
             return self._handle_tool_execution(response, api_params, tool_manager)
-        
+
         # Return direct response
         return response.content[0].text
     
@@ -133,3 +141,16 @@ Provide only the direct answer to what was asked.
         # Get final response
         final_response = self.client.messages.create(**final_params)
         return final_response.content[0].text
+
+    def _mock_response(self, query: str, tool_manager) -> str:
+        """Return search results directly when no API key is configured."""
+        if tool_manager:
+            results = tool_manager.execute_tool("search_course_content", query=query)
+            return (
+                "**[Mock mode — no API key configured]**\n\n"
+                f"Here are the raw search results for your query:\n\n{results}"
+            )
+        return (
+            "**[Mock mode — no API key configured]**\n\n"
+            "Add a real `ANTHROPIC_API_KEY` to `.env` to enable AI-generated responses."
+        )
