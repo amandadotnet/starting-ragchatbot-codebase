@@ -69,6 +69,7 @@ header h1 {
 
 /* Main Content Area with Sidebar */
 .main-content {
+    position: relative;
     flex: 1;
     display: flex;
     overflow: hidden;
@@ -82,7 +83,61 @@ header h1 {
     border-right: 1px solid var(--border-color);
     padding: 1.5rem;
     overflow-y: auto;
+    overflow-x: hidden;
     flex-shrink: 0;
+    opacity: 1;
+    transition: width 0.3s ease, padding 0.3s ease, opacity 0.2s ease, border-color 0.3s ease;
+}
+
+/* Collapsed Sidebar */
+.main-content.sidebar-collapsed .sidebar {
+    width: 0;
+    padding: 0;
+    opacity: 0;
+    border-right: none;
+    pointer-events: none;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    position: absolute;
+    top: 1rem;
+    left: 320px;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: left 0.3s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: var(--surface-hover);
+    color: var(--primary-color);
+}
+
+.sidebar-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.sidebar-toggle svg {
+    transition: transform 0.3s ease;
+}
+
+.main-content.sidebar-collapsed .sidebar-toggle {
+    left: 0;
+}
+
+.main-content.sidebar-collapsed .sidebar-toggle svg {
+    transform: rotate(180deg);
 }
 
 /* Custom Scrollbar for Sidebar */
@@ -669,7 +724,11 @@ details[open] .suggested-header::before {
     .chat-main {
         order: 1;
     }
-    
+
+    .sidebar-toggle {
+        display: none;
+    }
+
     header {
         padding: 1rem;
     }
@@ -714,5 +773,9 @@ details[open] .suggested-header::before {
 @media (max-width: 1024px) {
     .sidebar {
         width: 280px;
+    }
+
+    .sidebar-toggle {
+        left: 280px;
     }
 }

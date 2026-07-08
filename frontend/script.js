@@ -6,6 +6,7 @@ let currentSessionId = null;
 
 // DOM elements
 let chatMessages, chatInput, sendButton, totalCourses, courseTitles;
+let mainContent, sidebarToggle;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,8 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sendButton = document.getElementById('sendButton');
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
-    
+    mainContent = document.getElementById('mainContent');
+    sidebarToggle = document.getElementById('sidebarToggle');
+
     setupEventListeners();
+    initSidebarState();
     createNewSession();
     loadCourseStats();
 });
@@ -38,6 +42,26 @@ function setupEventListeners() {
             sendMessage();
         });
     });
+
+    // Sidebar toggle
+    sidebarToggle.addEventListener('click', toggleSidebar);
+}
+
+// Sidebar Toggle Functions
+function initSidebarState() {
+    const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    setSidebarCollapsed(collapsed);
+}
+
+function toggleSidebar() {
+    const isCollapsed = mainContent.classList.contains('sidebar-collapsed');
+    setSidebarCollapsed(!isCollapsed);
+}
+
+function setSidebarCollapsed(collapsed) {
+    mainContent.classList.toggle('sidebar-collapsed', collapsed);
+    sidebarToggle.setAttribute('aria-expanded', String(!collapsed));
+    localStorage.setItem('sidebarCollapsed', String(collapsed));
 }
 
 
