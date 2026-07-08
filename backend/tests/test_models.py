@@ -1,4 +1,4 @@
-from models import Course, Lesson, CourseChunk
+from models import Course, CourseChunk, Lesson
 
 
 def test_lesson_defaults():
@@ -22,7 +22,9 @@ def test_course_defaults():
 
 
 def test_course_with_fields():
-    course = Course(title="Python 101", course_link="https://example.com", instructor="Alice")
+    course = Course(
+        title="Python 101", course_link="https://example.com", instructor="Alice"
+    )
     assert course.course_link == "https://example.com"
     assert course.instructor == "Alice"
 
@@ -35,5 +37,7 @@ def test_course_chunk_defaults():
 
 
 def test_course_chunk_with_lesson():
-    chunk = CourseChunk(content="text", course_title="My Course", lesson_number=3, chunk_index=1)
+    chunk = CourseChunk(
+        content="text", course_title="My Course", lesson_number=3, chunk_index=1
+    )
     assert chunk.lesson_number == 3

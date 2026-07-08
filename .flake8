@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 88
+extend-ignore = E203, W503
+exclude = .venv,.git,__pycache__,backend/chroma_db,.trees,build,dist
+per-file-ignores =
+    # warnings.filterwarnings() must run before these imports to suppress an
+    # import-time warning, so imports can't move to the top of the file.
+    backend/app.py: E402
+    # SYSTEM_PROMPT lines are sent verbatim to Claude; wrapping would change
+    # the actual prompt text, not just its on-disk formatting.
+    backend/ai_generator.py: E501

@@ -7,13 +7,15 @@ fresh mock_rag and a patched app.rag_system so endpoint behaviour is fully
 controlled without touching ChromaDB or the Anthropic API.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 @pytest.fixture(scope="module")
 def app_module():
     import app  # noqa: PLC0415 — intentional deferred import
+
     return app
 
 
@@ -39,6 +41,7 @@ def client(app_module, mock_rag):
 
 # ── GET /api/courses ──────────────────────────────────────────────────────────
 
+
 def test_get_courses_status_ok(client):
     tc, _ = client
     assert tc.get("/api/courses").status_code == 200
@@ -61,6 +64,7 @@ def test_get_courses_values(client):
 
 # ── POST /api/query ───────────────────────────────────────────────────────────
 
+
 def test_post_query_status_ok(client):
     tc, _ = client
     r = tc.post("/api/query", json={"query": "What is Python?", "session_id": "s1"})
@@ -69,19 +73,25 @@ def test_post_query_status_ok(client):
 
 def test_post_query_returns_answer(client):
     tc, _ = client
-    data = tc.post("/api/query", json={"query": "What is Python?", "session_id": "s1"}).json()
+    data = tc.post(
+        "/api/query", json={"query": "What is Python?", "session_id": "s1"}
+    ).json()
     assert data["answer"] == "Test answer"
 
 
 def test_post_query_returns_sources(client):
     tc, _ = client
-    data = tc.post("/api/query", json={"query": "What is Python?", "session_id": "s1"}).json()
+    data = tc.post(
+        "/api/query", json={"query": "What is Python?", "session_id": "s1"}
+    ).json()
     assert "Course A - Lesson 1" in data["sources"]
 
 
 def test_post_query_echoes_session_id(client):
     tc, _ = client
-    data = tc.post("/api/query", json={"query": "Hello", "session_id": "my_session"}).json()
+    data = tc.post(
+        "/api/query", json={"query": "Hello", "session_id": "my_session"}
+    ).json()
     assert data["session_id"] == "my_session"
 
 

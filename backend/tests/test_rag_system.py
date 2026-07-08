@@ -8,10 +8,11 @@ left real since they're cheap and RAGSystem's wiring of them is worth
 covering directly.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+from models import Course, CourseChunk, Lesson
 from rag_system import RAGSystem
-from models import Course, Lesson, CourseChunk
 
 
 @pytest.fixture
@@ -30,10 +31,12 @@ def config():
 
 @pytest.fixture
 def rag(config):
-    with patch("rag_system.DocumentProcessor") as MockDP, \
-         patch("rag_system.VectorStore") as MockVS, \
-         patch("rag_system.AIGenerator") as MockAI, \
-         patch("rag_system.SessionManager") as MockSM:
+    with (
+        patch("rag_system.DocumentProcessor"),
+        patch("rag_system.VectorStore"),
+        patch("rag_system.AIGenerator"),
+        patch("rag_system.SessionManager"),
+    ):
         system = RAGSystem(config)
         yield system
 
@@ -51,11 +54,14 @@ def _chunks(title="Course A", n=2):
 
 # ── construction / wiring ───────────────────────────────────────────────────
 
+
 def test_init_constructs_components_from_config(config):
-    with patch("rag_system.DocumentProcessor") as MockDP, \
-         patch("rag_system.VectorStore") as MockVS, \
-         patch("rag_system.AIGenerator") as MockAI, \
-         patch("rag_system.SessionManager") as MockSM:
+    with (
+        patch("rag_system.DocumentProcessor") as MockDP,
+        patch("rag_system.VectorStore") as MockVS,
+        patch("rag_system.AIGenerator") as MockAI,
+        patch("rag_system.SessionManager") as MockSM,
+    ):
         system = RAGSystem(config)
 
     MockDP.assert_called_once_with(config.CHUNK_SIZE, config.CHUNK_OVERLAP)
@@ -77,6 +83,7 @@ def test_init_registers_search_tool(rag):
 
 
 # ── add_course_document ─────────────────────────────────────────────────────
+
 
 def test_add_course_document_returns_course_and_chunk_count(rag):
     course = _course()
@@ -111,6 +118,7 @@ def test_add_course_document_handles_processing_error(rag):
 
 
 # ── add_course_folder ───────────────────────────────────────────────────────
+
 
 def test_add_course_folder_missing_folder_returns_zero(rag):
     courses, chunks = rag.add_course_folder("/does/not/exist")
@@ -176,9 +184,12 @@ def test_add_course_folder_skips_file_processing_errors(rag, tmp_path):
 
 # ── query ────────────────────────────────────────────────────────────────────
 
+
 def test_query_returns_response_and_sources(rag):
     rag.ai_generator.generate_response.return_value = "The answer"
-    with patch.object(rag.tool_manager, "get_last_sources", return_value=["Course A - Lesson 1"]):
+    with patch.object(
+        rag.tool_manager, "get_last_sources", return_value=["Course A - Lesson 1"]
+    ):
         response, sources = rag.query("What is X?")
 
     assert response == "The answer"
@@ -233,14 +244,17 @@ def test_query_with_session_id_updates_history(rag):
 
 def test_query_resets_sources_after_retrieving(rag):
     rag.ai_generator.generate_response.return_value = "answer"
-    with patch.object(rag.tool_manager, "get_last_sources", return_value=["src"]), \
-         patch.object(rag.tool_manager, "reset_sources") as mock_reset:
+    with (
+        patch.object(rag.tool_manager, "get_last_sources", return_value=["src"]),
+        patch.object(rag.tool_manager, "reset_sources") as mock_reset,
+    ):
         rag.query("What is X?")
 
     mock_reset.assert_called_once()
 
 
 # ── get_course_analytics ────────────────────────────────────────────────────
+
 
 def test_get_course_analytics(rag):
     rag.vector_store.get_course_count.return_value = 4

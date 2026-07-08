@@ -6,8 +6,9 @@ is imported. This prevents loading the SentenceTransformer model, creating
 a real ChromaDB on disk, or calling the Anthropic API during tests.
 """
 
-import sys
 import os
+import sys
+import types
 from unittest.mock import MagicMock
 
 # Add backend/ to sys.path so tests can import backend modules directly
@@ -24,11 +25,9 @@ for _mod in [
 ]:
     sys.modules[_mod] = MagicMock()
 
+
 # Replace StaticFiles with a no-op class so app.py can be imported without
 # ../frontend existing on disk.
-import types
-
-
 class _FakeStaticFiles:
     def __init__(self, *args, **kwargs):
         pass
