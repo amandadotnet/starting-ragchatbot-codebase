@@ -18,6 +18,9 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "httpx>=0.27",
+    "black>=24.0",
+    "isort>=5.13",
+    "flake8>=7.0",
 ]
 
 [tool.pytest.ini_options]
@@ -26,3 +29,13 @@ pythonpath = ["backend"]
 filterwarnings = [
     "ignore:Using `httpx` with `starlette.testclient`",
 ]
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+extend-exclude = "backend/chroma_db"
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip = ["backend/chroma_db"]

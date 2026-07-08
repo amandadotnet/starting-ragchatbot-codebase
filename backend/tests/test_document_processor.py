@@ -1,7 +1,6 @@
 import pytest
 from document_processor import DocumentProcessor
 
-
 MINIMAL_COURSE = """\
 Course Title: Test Course
 Course Link: https://example.com/test
@@ -29,6 +28,7 @@ def small_proc():
 
 
 # ── chunk_text ────────────────────────────────────────────────────────────────
+
 
 def test_chunk_text_empty_returns_empty(proc):
     assert proc.chunk_text("") == []
@@ -71,6 +71,7 @@ def test_chunk_text_no_empty_chunks(small_proc):
 
 
 # ── process_course_document ───────────────────────────────────────────────────
+
 
 def test_extracts_course_title(proc, tmp_path):
     f = tmp_path / "course.txt"

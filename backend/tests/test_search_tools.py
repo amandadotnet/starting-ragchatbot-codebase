@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
 from search_tools import CourseSearchTool, ToolManager
 from vector_store import SearchResults
 
@@ -24,6 +25,7 @@ def tool(store):
 
 
 # ── CourseSearchTool ──────────────────────────────────────────────────────────
+
 
 def test_tool_definition_name(tool):
     assert tool.get_tool_definition()["name"] == "search_course_content"
@@ -104,6 +106,7 @@ def test_execute_multiple_results(tool, store):
 
 
 # ── ToolManager ───────────────────────────────────────────────────────────────
+
 
 def test_tool_manager_register_appears_in_definitions(store):
     tm = ToolManager()
